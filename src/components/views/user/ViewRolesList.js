@@ -8,74 +8,63 @@ import UserContex from "../../../context/userContext/UserContext";
 const ViewRolesList = () => {
     //let optionValue;
     let options = [{ id: 1, title: "Hospital" }, { id: 2, title: "Practice" }];
-    let hospitalList = [{ id: 1, name: "Max", typeId: 1 }, { id: 2, name: "Apollo", typeId: 1 }];
-    let practise = [{ id: 1, name: "practise1" }, { id: 2, name: "practise2" }]
-    let departmentList = [{ id: 1, name: "dep1" }, { id: 2, name: "dep2" }]
-    let practiseList = [{ id: 1, name: "ortho", typeId: 2 }, { id: 2, name: "demo", typeId: 2 }]
+
     const usrCtx = useContext(UserContex);
-    const [groupOptions, setGroupOptions] = useState([]);
+
     const [hosOptions, setHosOptions] = useState([]);
     const [userRoles, setUserRoles] = useState([]);
     const [optionValue, setOptionValue] = useState();
+    const [optionSubValue, setOptionSubValue] = useState();
+    const [optionsValue, setOptionsValue] = useState();
+    //type 1 for hosiptal and 0 for practice
+    const [selectedType, setSelectedType] = useState(-1);
 
-    const getUserRolesByGroupId = async (groupId) => {
-        // if(groupId > 0 )
-        // {
-        //     const res = await onApiCall('get', 'user/getUserAssignedRoles', null, { userId: usrCtx?.userInfo?.userId, groupId: groupId, userDid: usrCtx?.userInfo?.userDid });
-        //     if (res.data.statusCode == 200) {
-        //         setUserRoles(res.data.result);
-        //     }
-        // }
-        // else{
-        //     setUserRoles([]);
-        // }
-
+    const getCredentailDetails = () => {
     }
+    const chooseOptionType = async (event) => {
 
-    const getCredentailDetails = async (hash) => {
-        // const res = await onApiCall('get', 'user/getUserAssignedRoles', null, {hashId: hash});
-        // if (res.data.statusCode == 200) {
-        //     setUserRoles(res.data.result);
-        // }
-    }
-    const chooseOption = (event) => {
-        setOptionValue(event.target.value);
-        console.log(optionValue);
-        // console.log(hospitalValue);
-        // console.log(event.target.value);
         if (event.target.value == 1) {
-
-            setHosOptions(hospitalList);
-        } else
-            if (event.target.value == 2) {
-                setHosOptions(practiseList);
-            }
-
-
-
-
-    }
-    const selectHospital = (event) => {
-        // if(event.target.value==optionValue){
-        // console.log(optionValue);
-        // }
-    }
-    useEffect(() => {
-        const loadRoles = async () => {
-            const res = await onApiCall('get', 'user/getAllGroupByUserId', null, { userId: usrCtx?.userInfo?.userId });
+            const res = await onApiCall("get", 'user/getAllHospitalsInfo', null, null);
             if (res.data.statusCode == 200) {
-                setGroupOptions(res.data.result);
+                setHosOptions(res.data.result);
+            }
+            setSelectedType(1);
+            setOptionSubValue([]);
+        }
+        else {
+            const res = await onApiCall("get", 'user/getAllPractice', null, null);
+            if (res.data.statusCode == 200) {
+                setHosOptions(res.data.result);
+            }
+            setOptionSubValue([]);
+            setSelectedType(0);
+        }
+
+    }
+    const selectHospital = async (event) => {
+        let res = null;
+        console.log("-----", selectedType)
+        if (selectedType == 0) {
+            res = await onApiCall('get', 'user/getAllDepartmentByPracticeId', null, { practiceId: event.target.value })
+            if (res.data.statusCode == 200) {
+                setOptionSubValue(res.data.result);
             }
         }
-        loadRoles();
-    }, [])
+        if (selectedType == 1) {
+            res = await onApiCall('get', 'user/getAllDepartmentByHospitalId', null, { hospitalId: event.target.value })
+            if (res.data.statusCode == 200) {
+                setOptionSubValue(res.data.result);
+            }
+        }
+    }
+
 
     return (
         <Fragment>
             <div class="container">
                 <div className="row">
                     <div className="col-md-4">
-                        <select className="form-control" onChange={(event) => chooseOption(event)}>
+                        <select className="form-control" onChange={(event) => chooseOptionType(event)}>
                             <option value="0">Please select</option>
                             {options?.map(item => (
                                 <option key={item.id} value={item.id}>{item.title}</option>
@@ -83,7 +72,7 @@ const ViewRolesList = () => {
                         </select>
                     </div>
                     <div className="col-md-4">
-                        
+
                         <select className="form-control" onChange={(event) => selectHospital(event)}>
                             {/* {hospitalValue} */}
                             <option value="0">Please select</option>
@@ -100,11 +89,15 @@ const ViewRolesList = () => {
                         </select>
                     </div>
                     <div className="col-md-4">
-                        <select className="form-control" onChange={(event) => selectHospital(event)}>
+                        <select className="form-control">
                             <option value="0">Please select</option>
-                            {departmentList?.map(item => (
+                            {/* {departmentList?.map(item => (
                                 <option key={item.id} value={item.id}>{item.name}</option>
-                            ))}
+                            ))} */}
+                            {optionSubValue?.map(item => (
+                                <option key={item.id} value={item.id}>{item.name}</option>
+                            ))
+                            }
                         </select>
                     </div>
                 </div>
@@ -134,7 +127,7 @@ const ViewRolesList = () => {
                                     <Grid item xs={8}>
                                         <div class="row">
                                             <div class="col-md-9  align-slef-center">
-                                                <p>No Roles Assigned for you.{optionValue}</p>
+                                                <p>No Roles Assigned for you.</p>
                                             </div>
                                             <div class="col-md-3 = align-slef-center">
 
