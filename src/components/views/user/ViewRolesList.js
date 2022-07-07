@@ -4,13 +4,15 @@ import Grid from '@mui/material/Grid';
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import UserContex from "../../../context/userContext/UserContext";
+import DepartmentCredential from './HospitalDepartmentCredential.js'
+const ViewRolesList = (props) => {
 
-const ViewRolesList = () => {
+    console.log("-----hospital ctx",props);
     //let optionValue;
     let options = [{ id: 1, title: "Hospital" }, { id: 2, title: "Practice" }];
 
-    const usrCtx = useContext(UserContex);
 
+    let maxHospitalDepartment=[{id:1,name:"depname1"},{id:2,name:"depname2"}]
     const [hosOptions, setHosOptions] = useState([]);
     const [userRoles, setUserRoles] = useState([]);
     const [optionValue, setOptionValue] = useState();
@@ -36,26 +38,35 @@ const ViewRolesList = () => {
             if (res.data.statusCode == 200) {
                 setHosOptions(res.data.result);
             }
-            setOptionSubValue([]);
+            setOptionSubValue([]); 
             setSelectedType(0);
         }
 
     }
     const selectHospital = async (event) => {
+        console.log(props);
+        console.log(  JSON.stringify(props));
         let res = null;
         console.log("-----", selectedType)
         if (selectedType == 0) {
+            alert("hi")
             res = await onApiCall('get', 'user/getAllDepartmentByPracticeId', null, { practiceId: event.target.value })
             if (res.data.statusCode == 200) {
                 setOptionSubValue(res.data.result);
             }
         }
         if (selectedType == 1) {
+            alert('helol')
             res = await onApiCall('get', 'user/getAllDepartmentByHospitalId', null, { hospitalId: event.target.value })
             if (res.data.statusCode == 200) {
                 setOptionSubValue(res.data.result);
             }
         }
+    }
+    const selectDepartmentOrPractise= (event)=>{
+if(event){
+    alert("hi")
+}
     }
 
 
@@ -89,7 +100,7 @@ const ViewRolesList = () => {
                         </select>
                     </div>
                     <div className="col-md-4">
-                        <select className="form-control">
+                        <select className="form-control" onChange={(event) => selectDepartmentOrPractise(event)}>
                             <option value="0">Please select</option>
                             {/* {departmentList?.map(item => (
                                 <option key={item.id} value={item.id}>{item.name}</option>
@@ -121,13 +132,16 @@ const ViewRolesList = () => {
                         ))
 
                         :
+                        <>
                         <Card sx={{ minWidth: 1250 }} >
                             <CardContent >
                                 <Grid container spacing={2}>
                                     <Grid item xs={8}>
                                         <div class="row">
                                             <div class="col-md-9  align-slef-center">
-                                                <p>No Roles Assigned for you.</p>
+                                                <p>No Roles Assigned for you.
+                                                 
+                                                </p>
                                             </div>
                                             <div class="col-md-3 = align-slef-center">
 
@@ -138,7 +152,9 @@ const ViewRolesList = () => {
                                 </Grid>
                             </CardContent>
                         </Card>
-
+                        <br/>
+                        <DepartmentCredential maxList={maxHospitalDepartment}/>
+                        </>
                     }
                 </div>
 
