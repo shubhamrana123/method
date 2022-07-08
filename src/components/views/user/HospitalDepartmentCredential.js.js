@@ -1,7 +1,7 @@
 import { createContext, useState, Fragment } from 'react'
 import ViewRolesList from './ViewRolesList'
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-
+import DepartmentCredentialDetails from './DepartmentCredentialDetails';
 
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -22,23 +22,43 @@ const bull = (
 
 
 function DepartmentCredential(props) {
-
+  const [condition, setCondition] = useState(false);
+console.log(props);
+const goToDepartmentCredentialDetailCard = (event)=>{
+console.log(event);
+setCondition(true)
+}
   return (
     <>
-      {props.maxList.map(item => (
+      {    props.maxList.map(item => (
         <Card sx={{ minWidth: 275 }} variant="outlined" ma key={item.id}>
           <CardContent>
             {item.name}
           </CardContent>
           <CardActions>
-            <Button size="small">Learn More</Button>
+            <Button size="small" onClick={(event)=>goToDepartmentCredentialDetailCard(event)}>Learn More</Button>
           </CardActions>
         </Card>
-      ))}
+      ))
+     
+      }
+      {condition ?<DepartmentCredentialDetails />:null}
 
       {/* <Card variant="outlined">{card}</Card> */}
     </>
   )
+      // props.maxList.filter(item=>{
+      //   if(item.hospitalId==5 && item.departmentId==18){
+      //     <Card sx={{ minWidth: 275 }} variant="outlined" ma key={item.id}>
+      //     <CardContent>
+      //       {item.name}
+      //     </CardContent>
+      //     <CardActions>
+      //       <Button size="small">Learn More</Button>
+      //     </CardActions>
+      //   </Card>
+      //   };
+      // })
 }
 
 export default DepartmentCredential;

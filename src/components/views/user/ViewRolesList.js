@@ -7,23 +7,56 @@ import UserContex from "../../../context/userContext/UserContext";
 import DepartmentCredential from './HospitalDepartmentCredential.js'
 const ViewRolesList = (props) => {
 
-    console.log("-----hospital ctx",props);
+    console.log("-----hospital ctx", props);
     //let optionValue;
     let options = [{ id: 1, title: "Hospital" }, { id: 2, title: "Practice" }];
 
 
-    let maxHospitalDepartment=[{id:1,name:"depname1"},{id:2,name:"depname2"}]
+
     const [hosOptions, setHosOptions] = useState([]);
     const [userRoles, setUserRoles] = useState([]);
-    const [optionValue, setOptionValue] = useState();
+    const [departmentNameOption, setDepartmentNameOption] = useState('');
     const [optionSubValue, setOptionSubValue] = useState();
-    const [optionsValue, setOptionsValue] = useState();
+    const [condition, setCondition] = useState(false);
+    const [credentialForDeps, setCredentialForDeps] = useState([]);
+    const credentialForDep = [{
+        id: 1,
+        hospitalId: 5,
+        departmentId: 18,
+        name: 'credentail 1',
+        details: "credentail 1 details"
+    },
+    {
+        id: 2,
+        hospitalId: 5,
+        departmentId: 18,
+        name: 'credentails 2',
+        details: "credentail 2 details"
+    },
+    {
+        id: 3,
+        hospitalId: 5,
+        departmentId: 19,
+        name: 'credentails 3',
+        details: "credential 1 details"
+    },
+    {
+        id: 4,
+        hospitalId: 5,
+        departmentId: 19,
+        name: 'credentails 4',
+        details: "credential 2 details"
+    }]
+    const [showDepartmentCards, setShowDepartmentCards] = useState(false)
     //type 1 for hosiptal and 0 for practice
     const [selectedType, setSelectedType] = useState(-1);
 
     const getCredentailDetails = () => {
     }
     const chooseOptionType = async (event) => {
+
+        setCredentialForDeps([])
+
 
         if (event.target.value == 1) {
             const res = await onApiCall("get", 'user/getAllHospitalsInfo', null, null);
@@ -38,35 +71,69 @@ const ViewRolesList = (props) => {
             if (res.data.statusCode == 200) {
                 setHosOptions(res.data.result);
             }
-            setOptionSubValue([]); 
+            setOptionSubValue([]);
             setSelectedType(0);
         }
 
     }
     const selectHospital = async (event) => {
-        console.log(props);
-        console.log(  JSON.stringify(props));
         let res = null;
-        console.log("-----", selectedType)
+
         if (selectedType == 0) {
-            alert("hi")
+
             res = await onApiCall('get', 'user/getAllDepartmentByPracticeId', null, { practiceId: event.target.value })
             if (res.data.statusCode == 200) {
                 setOptionSubValue(res.data.result);
             }
         }
         if (selectedType == 1) {
-            alert('helol')
+
             res = await onApiCall('get', 'user/getAllDepartmentByHospitalId', null, { hospitalId: event.target.value })
             if (res.data.statusCode == 200) {
                 setOptionSubValue(res.data.result);
             }
         }
+        if (event.target.value == 0) {
+            setShowDepartmentCards(false)
+        }
     }
-    const selectDepartmentOrPractise= (event)=>{
-if(event){
-    alert("hi")
-}
+    const selectDepartmentOrPractise = (event) => {
+
+        console.log(event.target.value);
+        if (optionSubValue.length > 0) {
+            setShowDepartmentCards(true);
+        }
+        if (event.target.value == 0) {
+            setShowDepartmentCards(false);
+        }
+        setCredentialForDeps([])
+        if (event.target.value == 18) {
+            setCredentialForDeps([])
+            credentialForDep.filter((data) => {
+                if (data.departmentId == 18 && data.hospitalId == 5) {
+                    // console.log(data);
+
+                    setCredentialForDeps(prevState => (
+                        [...prevState, data]))
+
+                }
+
+            })
+        }
+        else
+            if (event.target.value == 19) {
+                setCredentialForDeps([])
+                credentialForDep.filter((data) => {
+                    if (data.departmentId == 19 && data.hospitalId == 5) {
+                        console.log(data);
+
+                        setCredentialForDeps(prevState =>
+                            [...prevState, data])
+
+                    }
+
+                })
+            }
     }
 
 
@@ -133,27 +200,30 @@ if(event){
 
                         :
                         <>
-                        <Card sx={{ minWidth: 1250 }} >
-                            <CardContent >
-                                <Grid container spacing={2}>
-                                    <Grid item xs={8}>
-                                        <div class="row">
-                                            <div class="col-md-9  align-slef-center">
-                                                <p>No Roles Assigned for you.
-                                                 
-                                                </p>
-                                            </div>
-                                            <div class="col-md-3 = align-slef-center">
 
-                                            </div>
-                                        </div>
-                                    </Grid>
+                            {showDepartmentCards ? <DepartmentCredential maxList={credentialForDeps} /> :
+                                <Card sx={{ minWidth: 1250 }} >
+                                    <CardContent >
+                                        <Grid container spacing={2}>
+                                            <Grid item xs={8}>
+                                                <div class="row">
+                                                    <div class="col-md-9  align-slef-center">
+                                                        <p>No Roles Assigned for you.
 
-                                </Grid>
-                            </CardContent>
-                        </Card>
-                        <br/>
-                        <DepartmentCredential maxList={maxHospitalDepartment}/>
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-md-3 = align-slef-center">
+
+                                                    </div>
+                                                </div>
+                                            </Grid>
+
+                                        </Grid>
+                                    </CardContent>
+                                </Card>
+
+                            }
+
                         </>
                     }
                 </div>
